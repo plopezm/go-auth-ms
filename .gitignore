@@ -1,0 +1,12 @@
+#Dependencies
+vendor/
+.DS_Store
+
+#SQLite3
+test.db
+
+#Intellij
+.idea/
+
+#Codecov
+coverage.txt
