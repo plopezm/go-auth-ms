@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"fmt"
 	"github.com/plopezm/go-auth-ms/security"
-	"strconv"
 )
 
 func generateNewJWT(claims jwt.Claims) (tokenString string){
@@ -20,13 +19,7 @@ func generateNewJWT(claims jwt.Claims) (tokenString string){
 }
 
 func GetPublicKey(c *gin.Context){
-	c.JSON(http.StatusOK, security.JWKRSA{
-		Kty: "RSA",
-		N: security.PublicKey.N.String(),
-		E: strconv.Itoa(security.PublicKey.E),
-		Alg: "RS512",
-		Kid: "go-auth-ms",
-	})
+	c.JSON(http.StatusOK, security.PublicKeyKWT)
 }
 
 func Login(c *gin.Context){

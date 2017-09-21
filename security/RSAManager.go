@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"crypto/rsa"
+	"strconv"
 )
 
 var PrivateKey *rsa.PrivateKey
 var PublicKey *rsa.PublicKey
+var PublicKeyKWT JWKRSA
 
 func init(){
 	var err error
@@ -16,6 +18,13 @@ func init(){
 	check(err)
 	PublicKey, err = jwt.ParseRSAPublicKeyFromPEM(ReadFile("pubkey.pem"))
 	check(err)
+	PublicKeyKWT = JWKRSA{
+		Kty: "RSA",
+		N: PublicKey.N.String(),
+		E: strconv.Itoa(PublicKey.E),
+		Alg: "RS512",
+		Kid: "go-auth-ms",
+	}
 }
 
 type JWKRSA struct {
