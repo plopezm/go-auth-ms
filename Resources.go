@@ -8,6 +8,11 @@ import (
 	"github.com/plopezm/go-auth-ms/security"
 )
 
+type AuthToken struct {
+	Type			string	`json:"type"`
+	Token			string	`json:"token"`
+}
+
 func generateNewJWT(claims jwt.Claims) (tokenString string){
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
 
@@ -28,10 +33,14 @@ func Login(c *gin.Context){
 	//c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
 	//c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 	//c.Writer.Header().Set("Access-Control-Max-Age", "86400")
-	c.Writer.Header().Set("Authorization", "Bearer "+generateNewJWT(jwt.MapClaims{
+	token := generateNewJWT(jwt.MapClaims{
 		"user": "test",
-	}))
-	c.Status(http.StatusOK)
+	})
+	c.Writer.Header().Set("Authorization", "Bearer "+token)
+	c.JSON(http.StatusOK, AuthToken{
+		Type: "jwt",
+		Token:token,
+	})
 }
 
 func Verify(c *gin.Context){
