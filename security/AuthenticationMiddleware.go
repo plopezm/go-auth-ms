@@ -11,9 +11,18 @@ import (
 
 type handler func(c *gin.Context)
 
+func setCORSEnabled(c *gin.Context){
+	c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+	c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+	c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+	c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+	c.Writer.Header().Set("Access-Control-Max-Age", "86400")
+}
 
 func BasicAuth(ptr handler) gin.HandlerFunc{
 	return func(c *gin.Context){
+		setCORSEnabled(c)
+
 		auth := strings.SplitN(c.GetHeader("Authorization"), " ", 2)
 		if len(auth) != 2 || auth[0] != "Basic" {
 			c.Status(http.StatusUnauthorized)
@@ -32,6 +41,8 @@ func BasicAuth(ptr handler) gin.HandlerFunc{
 
 func BearerAuth(ptr handler) gin.HandlerFunc {
 	return func(c *gin.Context){
+		setCORSEnabled(c)
+
 		tokenString := strings.SplitN(c.GetHeader("Authorization"), " ", 2)
 		if len(tokenString) != 2 || tokenString[0] != "Bearer" {
 			c.String(http.StatusUnauthorized, "Bearer header required")

@@ -32,6 +32,12 @@
   revision = "ae59567b9aab61b50b2590679a62c3c044030b61"
 
 [[projects]]
+  name = "github.com/itsjamie/gin-cors"
+  packages = ["."]
+  revision = "97b4a9da79331dfa2b6d35f4cdd1e50f5148859c"
+  version = "1.0.0"
+
+[[projects]]
   name = "github.com/mattn/go-isatty"
   packages = ["."]
   revision = "fc9e8d8ef48496124e79ae0df75490096eccf6fe"
@@ -76,6 +82,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b0d820d4bcc59ac50441cdef15508b8c3c5046438304e0633bd33e7a65ab46a5"
+  inputs-digest = "ef49ec5c426b5c790a169a277ac68f1d5444ac4c1a2ababd43e2f744aba3cbda"
   solver-name = "gps-cdcl"
   solver-version = 1
