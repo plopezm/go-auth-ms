@@ -67,8 +67,6 @@ func init(){
 }
 
 func main() {
-	gin.SetMode(gin.ReleaseMode)
-
 	router = gin.Default()
 	router.GET("/login", security.BasicAuth(Login))
 	router.GET("/verify", security.BearerAuth(Verify))
