@@ -10,3 +10,7 @@ test.db
 
 #Codecov
 coverage.txt
+
+#Binary
+go-auth-ms.exe
+go-auth-ms

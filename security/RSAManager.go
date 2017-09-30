@@ -2,7 +2,6 @@ package security
 
 import (
 	"io/ioutil"
-	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"crypto/rsa"
 	"strconv"
@@ -38,7 +37,7 @@ type JWKRSA struct {
 func ReadFile(file string) []byte{
 	dat, err := ioutil.ReadFile(file)
 	check(err)
-	fmt.Print(string(dat))
+	//fmt.Print(string(dat))
 	return dat
 }
 

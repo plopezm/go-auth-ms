@@ -34,7 +34,7 @@ func TestLoginNotAuthorized(t *testing.T) {
 
 func TestLogin(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/login", nil)
-	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("test:test")))
+	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("admin:admin")))
 	w := httptest.NewRecorder()
 
 	r := gin.Default()
@@ -42,4 +42,16 @@ func TestLogin(t *testing.T) {
 	r.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
+}
+
+func TestLoginUnauthorized(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/login", nil)
+	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("admin:notAuth")))
+	w := httptest.NewRecorder()
+
+	r := gin.Default()
+	r.GET("/login", security.BasicAuth(Login))
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
 }
