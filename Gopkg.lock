@@ -44,10 +44,10 @@
   version = "v0.0.3"
 
 [[projects]]
-  name = "github.com/plopezm/goedb"
-  packages = [".","config","dialect","manager","metadata"]
-  revision = "5978932e859c7ad7ac12c6da6ea5a9209efd40f3"
-  version = "v1.0.0-RC3"
+  name = "github.com/mattn/go-sqlite3"
+  packages = ["."]
+  revision = "ca5e3819723d8eeaf170ad510e7da1d6d2e94a08"
+  version = "v1.2.0"
 
 [[projects]]
   name = "github.com/pmezard/go-difflib"
@@ -66,6 +66,12 @@
   name = "github.com/ugorji/go"
   packages = ["codec"]
   revision = "54210f4e076c57f351166f0ed60e67d3fca57a36"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/net"
+  packages = ["context"]
+  revision = "0a9397675ba34b2845f758fe3cd68828369c6517"
 
 [[projects]]
   branch = "master"
@@ -88,6 +94,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d4442261b89063e293413586eea0a961d62f3044f8053840582a7c2c4947a1ea"
+  inputs-digest = "19b67c2bb55868ff61e0f2bf8af20140e45ad9e8226486860f4079c677b9030a"
   solver-name = "gps-cdcl"
   solver-version = 1
