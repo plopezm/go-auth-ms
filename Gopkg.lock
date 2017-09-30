@@ -50,6 +50,12 @@
   version = "v1.2.0"
 
 [[projects]]
+  name = "github.com/plopezm/goedb"
+  packages = [".","config","dialect","manager","metadata"]
+  revision = "711f796ee5b59f876b95a2b28366796ff1db7340"
+  version = "v1.0.0-RC4"
+
+[[projects]]
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
