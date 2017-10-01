@@ -68,10 +68,11 @@ func init(){
 
 func main() {
 	router = gin.Default()
-	router.GET("/login", security.BasicAuth(Login))
-	router.GET("/verify", security.BearerAuth(Verify))
-	router.GET("/refresh", security.BearerAuth(Refresh))
-	router.GET("/pubkey", GetPublicKey)
+	v1 := router.Group("/api/v1")
+	v1.GET("/login", security.BasicAuth(Login))
+	v1.GET("/verify", security.BearerAuth(Verify))
+	v1.GET("/refresh", security.BearerAuth(Refresh))
+	v1.GET("/pubkey", GetPublicKey)
 
 	router.Use(CORSMiddleware())
 	router.Run("0.0.0.0:9090")
