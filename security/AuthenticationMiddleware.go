@@ -20,9 +20,9 @@ func setCORSEnabled(c *gin.Context){
 	c.Writer.Header().Set("Access-Control-Max-Age", "86400")
 }
 
-func BasicAuth(ptr handler) gin.HandlerFunc{
+func BasicAuth(ptr gin.HandlerFunc) gin.HandlerFunc{
 	return func(c *gin.Context){
-		setCORSEnabled(c)
+		//setCORSEnabled(c)
 
 		auth := strings.SplitN(c.GetHeader("Authorization"), " ", 2)
 		if len(auth) != 2 || auth[0] != "Basic" {
@@ -40,9 +40,9 @@ func BasicAuth(ptr handler) gin.HandlerFunc{
 	}
 }
 
-func BearerAuth(ptr handler) gin.HandlerFunc {
+func BearerAuth(ptr gin.HandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context){
-		setCORSEnabled(c)
+		//setCORSEnabled(c)
 
 		tokenString := strings.SplitN(c.GetHeader("Authorization"), " ", 2)
 		if len(tokenString) != 2 || tokenString[0] != "Bearer" {
@@ -72,6 +72,7 @@ func BearerAuth(ptr handler) gin.HandlerFunc {
 }
 
 func validateUser(c *gin.Context, username, password string) bool {
+
 	user, err := services.GetUserByAccount(username, password)
 	if err != nil {
 		return false

@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"fmt"
 	"github.com/plopezm/go-auth-ms/security"
+	"github.com/plopezm/go-auth-ms/services"
+	"strconv"
 )
 
 type AuthToken struct {
@@ -28,7 +30,6 @@ func GetPublicKey(c *gin.Context){
 }
 
 func Login(c *gin.Context){
-
 	username, ok := c.Get("username")
 	if !ok {
 		c.Status(http.StatusUnauthorized)
@@ -40,7 +41,7 @@ func Login(c *gin.Context){
 	})
 	c.Writer.Header().Set("Authorization", "Bearer "+token)
 	c.JSON(http.StatusOK, AuthToken{
-		Type: "jwt",
+		Type: "Bearer",
 		Token:token,
 	})
 }
@@ -60,5 +61,29 @@ func Refresh(c *gin.Context){
 		return
 	}
 	c.Status(http.StatusBadRequest)
+}
+
+func GetUsers(c *gin.Context){
+	users, err := services.FindAllUsers()
+	if err != nil{
+		fmt.Println("Error finding users: ", err)
+		c.JSON(http.StatusNotFound, err)
+		return
+	}
+	c.JSON(http.StatusOK, users)
+}
+
+func GetUserById(c *gin.Context){
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil{
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	users, err := services.GetUserById(id)
+	if err != nil{
+		c.JSON(http.StatusNotFound, err)
+		return
+	}
+	c.JSON(http.StatusOK, users)
 }
 

@@ -40,6 +40,14 @@ func GetUserById(id int) (user *User, err error){
 	return user, err
 }
 
+func FindAllUsers() (user []User, err error){
+	em, err := goedb.GetEntityManager(PersistenceUnit)
+	checkError(err)
+	users := make([]User, 0)
+	err = em.Find(&users, "", nil)
+	return users, err
+}
+
 func GetUserByAccount(username string, pass string) (user *User, err error){
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)

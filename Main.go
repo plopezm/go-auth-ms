@@ -14,9 +14,10 @@ var router *gin.Engine
 
 func CORSMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		fmt.Println("Generating CORS headers")
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "OPTIONS, GET, POST, PUT, DELETE")
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		c.Writer.Header().Set("Access-Control-Max-Age", "86400")
 
@@ -24,7 +25,6 @@ func CORSMiddleware() gin.HandlerFunc {
 			c.AbortWithStatus(204)
 			return
 		}
-
 		c.Next()
 	}
 }
@@ -66,13 +66,21 @@ func init(){
 	//checkError(err)
 }
 
+
+func AddAuthRoutes(router *gin.Engine){
+}
+
+
+
 func main() {
 	router = gin.Default()
-	router.GET("/login", security.BasicAuth(Login))
-	router.GET("/verify", security.BearerAuth(Verify))
-	router.GET("/refresh", security.BearerAuth(Refresh))
-	router.GET("/pubkey", GetPublicKey)
-
 	router.Use(CORSMiddleware())
+	v1 := router.Group("/api/v1")
+	v1.GET("/login", security.BasicAuth(Login))
+	v1.GET("/verify", security.BearerAuth(Verify))
+	v1.GET("/refresh", security.BearerAuth(Refresh))
+	v1.GET("/pubkey", GetPublicKey)
+	v1.GET("/users", security.BearerAuth(GetUsers))
+	v1.GET("/users/:id", security.BearerAuth(GetUserById))
 	router.Run("0.0.0.0:9090")
 }

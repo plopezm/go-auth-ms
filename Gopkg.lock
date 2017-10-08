@@ -52,8 +52,8 @@
 [[projects]]
   name = "github.com/plopezm/goedb"
   packages = [".","config","dialect","manager","metadata"]
-  revision = "711f796ee5b59f876b95a2b28366796ff1db7340"
-  version = "v1.0.0-RC4"
+  revision = "d12d35cd8049cf328ac3931cc7de06d8bbe4bf3f"
+  version = "v1.0.0-RC5"
 
 [[projects]]
   name = "github.com/pmezard/go-difflib"
@@ -77,13 +77,13 @@
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context"]
-  revision = "0a9397675ba34b2845f758fe3cd68828369c6517"
+  revision = "a04bdaca5b32abe1c069418fb7088ae607de5bd0"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "314a259e304ff91bd6985da2a7149bbf91237993"
+  revision = "ebfc5b4631820b793c9010c87fd8fef0f39eb082"
 
 [[projects]]
   name = "gopkg.in/go-playground/validator.v8"
