@@ -52,8 +52,16 @@ func init(){
 
 	_, err = em.Insert(role)
 	//checkError(err)
+
+	role = &services.Role{
+		Name: "Regular",
+	}
+
+	_, err = em.Insert(role)
+	//checkError(err)
+
 	em.First(role, "Role.Name = :name", map[string]interface{}{
-		"name": "Admin",
+		"name": "Regular",
 	})
 
 	user := &services.User{
@@ -82,5 +90,13 @@ func main() {
 	v1.GET("/pubkey", GetPublicKey)
 	v1.GET("/users", security.BearerAuth(GetUsers))
 	v1.GET("/users/:id", security.BearerAuth(GetUserById))
+	v1.POST("/users", security.BearerAuth(CreateUser))
+	v1.PUT("/users", security.BearerAuth(UpdateUser))
+	v1.DELETE("/users/:id", security.BearerAuth(DeleteUser))
+	v1.GET("/roles", security.BearerAuth(GetRoles))
+	v1.GET("/roles/:id", security.BearerAuth(GetRoleById))
+	v1.POST("/roles", security.BearerAuth(CreateRole))
+	v1.PUT("/roles", security.BearerAuth(UpdateRole))
+	v1.DELETE("/roles/:id", security.BearerAuth(DeleteRole))
 	router.Run("0.0.0.0:9090")
 }

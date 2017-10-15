@@ -87,3 +87,98 @@ func GetUserById(c *gin.Context){
 	c.JSON(http.StatusOK, users)
 }
 
+func CreateUser(c *gin.Context){
+	var user services.User
+	c.BindJSON(&user)
+	user, err := services.CreateUser(user)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	c.JSON(http.StatusCreated, user)
+}
+
+func UpdateUser(c *gin.Context){
+	var user services.User
+	c.BindJSON(&user)
+	user, err := services.UpdateUser(user)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	c.JSON(http.StatusCreated, user)
+}
+
+func DeleteUser(c *gin.Context){
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil{
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	user, err := services.DeleteUserById(id)
+	if err != nil{
+		c.JSON(http.StatusNotFound, err)
+		return
+	}
+	c.JSON(http.StatusOK, user)
+}
+
+func GetRoles(c *gin.Context){
+	roles, err := services.FindAllRoles()
+	if err != nil{
+		fmt.Println("Error finding roles: ", err)
+		c.JSON(http.StatusNotFound, err)
+		return
+	}
+	c.JSON(http.StatusOK, roles)
+}
+
+func GetRoleById(c *gin.Context){
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil{
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	role, err := services.GetRoleById(id)
+	if err != nil{
+		c.JSON(http.StatusNotFound, err)
+		return
+	}
+	c.JSON(http.StatusOK, role)
+}
+
+func CreateRole(c *gin.Context){
+	var role services.Role
+	c.BindJSON(&role)
+	user, err := services.CreateRole(role)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	c.JSON(http.StatusCreated, user)
+}
+
+func UpdateRole(c *gin.Context){
+	var role services.Role
+	c.BindJSON(&role)
+	user, err := services.UpdateRole(role)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	c.JSON(http.StatusCreated, user)
+}
+
+func DeleteRole(c *gin.Context){
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil{
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	role, err := services.DeleteRoleById(id)
+	if err != nil{
+		c.JSON(http.StatusNotFound, err)
+		return
+	}
+	c.JSON(http.StatusOK, role)
+}
