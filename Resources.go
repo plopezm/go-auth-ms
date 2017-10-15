@@ -8,6 +8,7 @@ import (
 	"github.com/plopezm/go-auth-ms/security"
 	"github.com/plopezm/go-auth-ms/services"
 	"strconv"
+	"time"
 )
 
 type AuthToken struct {
@@ -16,12 +17,14 @@ type AuthToken struct {
 }
 
 func generateNewJWT(claims jwt.Claims) (tokenString string){
-	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodRS512, claims)
 
 	// Sign and get the complete encoded token as a string using the secret
 	tokenString, err := token.SignedString(security.PrivateKey)
 
-	fmt.Println("Token string generated: ",tokenString, err)
+	if err != nil {
+		fmt.Println("[generateNewJWT]: ", err)
+	}
 	return tokenString
 }
 
@@ -38,6 +41,7 @@ func Login(c *gin.Context){
 
 	token := generateNewJWT(jwt.MapClaims{
 		"user": username,
+		"exp": time.Now().Add(time.Second * 4).Unix(),
 	})
 	c.Writer.Header().Set("Authorization", "Bearer "+token)
 	c.JSON(http.StatusOK, AuthToken{
