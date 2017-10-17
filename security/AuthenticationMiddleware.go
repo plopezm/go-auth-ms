@@ -1,27 +1,27 @@
 package security
 
 import (
-	"github.com/gin-gonic/gin"
-	"strings"
-	"net/http"
 	"encoding/base64"
-	"github.com/dgrijalva/jwt-go"
+	"errors"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 	"github.com/plopezm/go-auth-ms/services"
+	"net/http"
+	"strings"
+	"time"
 )
 
 type handler func(c *gin.Context)
 
-func setCORSEnabled(c *gin.Context){
-	c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-	c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-	c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
-	c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-	c.Writer.Header().Set("Access-Control-Max-Age", "86400")
+func sendUnauthorized(c *gin.Context, err error) {
+	fmt.Println(err.Error())
+	c.String(http.StatusUnauthorized, "Token not valid: ", err.Error())
+	return
 }
 
-func BasicAuth(ptr gin.HandlerFunc) gin.HandlerFunc{
-	return func(c *gin.Context){
+func BasicAuth(ptr gin.HandlerFunc) gin.HandlerFunc {
+	return func(c *gin.Context) {
 		//setCORSEnabled(c)
 
 		auth := strings.SplitN(c.GetHeader("Authorization"), " ", 2)
@@ -40,8 +40,19 @@ func BasicAuth(ptr gin.HandlerFunc) gin.HandlerFunc{
 	}
 }
 
+func getTokenRemainingValidity(timestamp interface{}) int {
+	if validity, ok := timestamp.(float64); ok {
+		tm := time.Unix(int64(validity), 0)
+		remainer := tm.Sub(time.Now())
+		if remainer > 0 {
+			return int(remainer.Seconds())
+		}
+	}
+	return -1
+}
+
 func BearerAuth(ptr gin.HandlerFunc) gin.HandlerFunc {
-	return func(c *gin.Context){
+	return func(c *gin.Context) {
 		//setCORSEnabled(c)
 
 		tokenString := strings.SplitN(c.GetHeader("Authorization"), " ", 2)
@@ -61,10 +72,20 @@ func BearerAuth(ptr gin.HandlerFunc) gin.HandlerFunc {
 		})
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			expires, ok := claims["exp"]
+			if !ok {
+				sendUnauthorized(c, errors.New("Token not valid"))
+				return
+			}
+
+			if getTokenRemainingValidity(expires) == -1 {
+				sendUnauthorized(c, errors.New("Token validity expired"))
+				return
+			}
+
 			c.Set("claims", claims)
 		} else {
-			fmt.Println(err)
-			c.String(http.StatusUnauthorized, "Token not valid: ", err)
+			sendUnauthorized(c, err)
 			return
 		}
 		ptr(c)

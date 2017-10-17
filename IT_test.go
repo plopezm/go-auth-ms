@@ -1,13 +1,14 @@
 package main
 
 import (
-	"testing"
-	"net/http"
-	"github.com/stretchr/testify/assert"
 	"encoding/base64"
-	"net/http/httptest"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/plopezm/go-auth-ms/security"
+	"github.com/stretchr/testify/assert"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 )
 
 func TestGetPublicKey(t *testing.T) {
@@ -39,9 +40,23 @@ func TestLogin(t *testing.T) {
 
 	r := gin.Default()
 	r.GET("/login", security.BasicAuth(Login))
+	r.GET("/refresh", security.BearerAuth(Refresh))
 	r.ServeHTTP(w, req)
 
+	var token AuthToken
+	json.Unmarshal(w.Body.Bytes(), &token)
+
+	assert.Equal(t, "Bearer", token.Type)
+	assert.NotNil(t, token.Token)
+	assert.NotEqual(t, "", token.Token)
 	assert.Equal(t, http.StatusOK, w.Code)
+
+	refreshReq, _ := http.NewRequest("GET", "/refresh", nil)
+	refreshReq.Header.Set("Authorization", "Bearer "+token.Token)
+	w = httptest.NewRecorder()
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
 }
 
 func TestLoginUnauthorized(t *testing.T) {

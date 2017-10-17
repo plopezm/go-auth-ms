@@ -1,35 +1,35 @@
 package services
 
 import (
-	"github.com/plopezm/goedb"
-	"os"
+	"errors"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
-	"errors"
+	"github.com/plopezm/goedb"
+	"os"
 )
 
 type Role struct {
-	ID		int `goedb:"pk,autoincrement"`
-	Name 	string `goedb:"unique"`
+	ID   int    `goedb:"pk,autoincrement"`
+	Name string `goedb:"unique"`
 }
 
 type User struct {
-	ID			int	`goedb:"pk,autoincrement"`
-	Email		string  `goedb:"unique"`
-	Password 	string
-	Role		Role	`goedb:"fk=Role(ID)"`
+	ID       int    `goedb:"pk,autoincrement"`
+	Email    string `goedb:"unique"`
+	Password string
+	Role     Role `goedb:"fk=Role(ID)"`
 }
 
 const PersistenceUnit = "testing"
 
-func checkError(err error){
+func checkError(err error) {
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 }
 
-func FindAllUsers() (user []User, err error){
+func FindAllUsers() (user []User, err error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
 	users := make([]User, 0)
@@ -37,7 +37,7 @@ func FindAllUsers() (user []User, err error){
 	return users, err
 }
 
-func GetUserById(id int) (user User, err error){
+func GetUserById(id int) (user User, err error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
 	user = User{}
@@ -49,13 +49,13 @@ func GetUserById(id int) (user User, err error){
 	return user, err
 }
 
-func GetUserByAccount(username string, pass string) (user User, err error){
+func GetUserByAccount(username string, pass string) (user User, err error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
 	user = User{}
 	err = em.First(&user, "User.Email = :email AND User.Password = :pass", map[string]interface{}{
 		"email": username,
-		"pass": pass,
+		"pass":  pass,
 	})
 	if err != nil {
 		return user, err
@@ -63,11 +63,11 @@ func GetUserByAccount(username string, pass string) (user User, err error){
 	return user, err
 }
 
-func CreateUser(user User) (User, error){
+func CreateUser(user User) (User, error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
 
-	result, err := em.Insert(&user);
+	result, err := em.Insert(&user)
 	if err != nil {
 		return user, err
 	}
@@ -76,14 +76,14 @@ func CreateUser(user User) (User, error){
 		return user, errors.New("Creation failed")
 	}
 
-	return user, nil;
+	return user, nil
 }
 
-func UpdateUser(user User) (User, error){
+func UpdateUser(user User) (User, error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
 
-	result, err := em.Update(&user);
+	result, err := em.Update(&user)
 	if err != nil {
 		return user, err
 	}
@@ -92,10 +92,10 @@ func UpdateUser(user User) (User, error){
 		return user, errors.New("Update failed")
 	}
 
-	return user, nil;
+	return user, nil
 }
 
-func DeleteUserById(id int) (user User, err error){
+func DeleteUserById(id int) (user User, err error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
 	user = User{}
@@ -110,7 +110,7 @@ func DeleteUserById(id int) (user User, err error){
 	return user, err
 }
 
-func FindAllRoles() ([]Role, error){
+func FindAllRoles() ([]Role, error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
 	roles := make([]Role, 0)
@@ -118,7 +118,7 @@ func FindAllRoles() ([]Role, error){
 	return roles, err
 }
 
-func GetRoleById(id int) (role Role, err error){
+func GetRoleById(id int) (role Role, err error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
 	role = Role{}
@@ -130,11 +130,11 @@ func GetRoleById(id int) (role Role, err error){
 	return role, err
 }
 
-func CreateRole(role Role) (Role, error){
+func CreateRole(role Role) (Role, error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
 
-	result, err := em.Insert(&role);
+	result, err := em.Insert(&role)
 	if err != nil {
 		return role, err
 	}
@@ -143,14 +143,14 @@ func CreateRole(role Role) (Role, error){
 		return role, errors.New("Creation failed")
 	}
 
-	return role, nil;
+	return role, nil
 }
 
-func UpdateRole(role Role) (Role, error){
+func UpdateRole(role Role) (Role, error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
 
-	result, err := em.Update(&role);
+	result, err := em.Update(&role)
 	if err != nil {
 		return role, err
 	}
@@ -159,10 +159,10 @@ func UpdateRole(role Role) (Role, error){
 		return role, errors.New("Update failed")
 	}
 
-	return role, nil;
+	return role, nil
 }
 
-func DeleteRoleById(id int) (role Role, err error){
+func DeleteRoleById(id int) (role Role, err error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
 	role = Role{}
