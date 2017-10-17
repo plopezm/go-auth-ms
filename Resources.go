@@ -1,22 +1,25 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/dgrijalva/jwt-go"
-	"net/http"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 	"github.com/plopezm/go-auth-ms/security"
 	"github.com/plopezm/go-auth-ms/services"
+	"net/http"
 	"strconv"
 	"time"
 )
 
+// 24 hours
+const TOKEN_TTL = 86400000
+
 type AuthToken struct {
-	Type			string	`json:"type"`
-	Token			string	`json:"token"`
+	Type  string `json:"type"`
+	Token string `json:"token"`
 }
 
-func generateNewJWT(claims jwt.Claims) (tokenString string){
+func generateNewJWT(claims jwt.Claims) (tokenString string) {
 	token := jwt.NewWithClaims(jwt.SigningMethodRS512, claims)
 
 	// Sign and get the complete encoded token as a string using the secret
@@ -28,48 +31,49 @@ func generateNewJWT(claims jwt.Claims) (tokenString string){
 	return tokenString
 }
 
-func GetPublicKey(c *gin.Context){
+func GetPublicKey(c *gin.Context) {
 	c.JSON(http.StatusOK, security.PublicKeyKWT)
 }
 
-func Login(c *gin.Context){
+func Login(c *gin.Context) {
 	username, ok := c.Get("username")
 	if !ok {
 		c.Status(http.StatusUnauthorized)
 		return
 	}
-
 	token := generateNewJWT(jwt.MapClaims{
 		"user": username,
-		"exp": time.Now().Add(time.Second * 4).Unix(),
+		"exp":  time.Now().Add(time.Millisecond * TOKEN_TTL).Unix(),
 	})
 	c.Writer.Header().Set("Authorization", "Bearer "+token)
 	c.JSON(http.StatusOK, AuthToken{
-		Type: "Bearer",
-		Token:token,
+		Type:  "Bearer",
+		Token: token,
 	})
 }
 
-func Verify(c *gin.Context){
-}
-
-func Refresh(c *gin.Context){
+func Refresh(c *gin.Context) {
 	value, exists := c.Get("claims")
 	if !exists {
-		c.Status(http.StatusBadRequest)
+		c.String(http.StatusBadRequest, "Token does not exist")
 		return
 	}
-	if claims, ok := value.(jwt.MapClaims); !ok{
-		c.Header("Authorization", "Bearer "+generateNewJWT(claims))
-		c.Status(http.StatusOK)
+	if claims, ok := value.(jwt.MapClaims); ok {
+		claims["exp"] = time.Now().Add(time.Second * TOKEN_TTL).Unix()
+		token := generateNewJWT(claims)
+		c.Header("Authorization", "Bearer "+token)
+		c.JSON(http.StatusOK, AuthToken{
+			Type:  "Bearer",
+			Token: token,
+		})
 		return
 	}
-	c.Status(http.StatusBadRequest)
+	c.String(http.StatusBadRequest, "Claims not valid")
 }
 
-func GetUsers(c *gin.Context){
+func GetUsers(c *gin.Context) {
 	users, err := services.FindAllUsers()
-	if err != nil{
+	if err != nil {
 		fmt.Println("Error finding users: ", err)
 		c.JSON(http.StatusNotFound, err)
 		return
@@ -77,21 +81,21 @@ func GetUsers(c *gin.Context){
 	c.JSON(http.StatusOK, users)
 }
 
-func GetUserById(c *gin.Context){
+func GetUserById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil{
+	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 	users, err := services.GetUserById(id)
-	if err != nil{
+	if err != nil {
 		c.JSON(http.StatusNotFound, err)
 		return
 	}
 	c.JSON(http.StatusOK, users)
 }
 
-func CreateUser(c *gin.Context){
+func CreateUser(c *gin.Context) {
 	var user services.User
 	c.BindJSON(&user)
 	user, err := services.CreateUser(user)
@@ -102,7 +106,7 @@ func CreateUser(c *gin.Context){
 	c.JSON(http.StatusCreated, user)
 }
 
-func UpdateUser(c *gin.Context){
+func UpdateUser(c *gin.Context) {
 	var user services.User
 	c.BindJSON(&user)
 	user, err := services.UpdateUser(user)
@@ -113,23 +117,23 @@ func UpdateUser(c *gin.Context){
 	c.JSON(http.StatusCreated, user)
 }
 
-func DeleteUser(c *gin.Context){
+func DeleteUser(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil{
+	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 	user, err := services.DeleteUserById(id)
-	if err != nil{
+	if err != nil {
 		c.JSON(http.StatusNotFound, err)
 		return
 	}
 	c.JSON(http.StatusOK, user)
 }
 
-func GetRoles(c *gin.Context){
+func GetRoles(c *gin.Context) {
 	roles, err := services.FindAllRoles()
-	if err != nil{
+	if err != nil {
 		fmt.Println("Error finding roles: ", err)
 		c.JSON(http.StatusNotFound, err)
 		return
@@ -137,21 +141,21 @@ func GetRoles(c *gin.Context){
 	c.JSON(http.StatusOK, roles)
 }
 
-func GetRoleById(c *gin.Context){
+func GetRoleById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil{
+	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 	role, err := services.GetRoleById(id)
-	if err != nil{
+	if err != nil {
 		c.JSON(http.StatusNotFound, err)
 		return
 	}
 	c.JSON(http.StatusOK, role)
 }
 
-func CreateRole(c *gin.Context){
+func CreateRole(c *gin.Context) {
 	var role services.Role
 	c.BindJSON(&role)
 	user, err := services.CreateRole(role)
@@ -162,7 +166,7 @@ func CreateRole(c *gin.Context){
 	c.JSON(http.StatusCreated, user)
 }
 
-func UpdateRole(c *gin.Context){
+func UpdateRole(c *gin.Context) {
 	var role services.Role
 	c.BindJSON(&role)
 	user, err := services.UpdateRole(role)
@@ -173,14 +177,14 @@ func UpdateRole(c *gin.Context){
 	c.JSON(http.StatusCreated, user)
 }
 
-func DeleteRole(c *gin.Context){
+func DeleteRole(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil{
+	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 	role, err := services.DeleteRoleById(id)
-	if err != nil{
+	if err != nil {
 		c.JSON(http.StatusNotFound, err)
 		return
 	}

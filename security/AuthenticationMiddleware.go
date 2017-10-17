@@ -1,35 +1,27 @@
 package security
 
 import (
-	"github.com/gin-gonic/gin"
-	"strings"
-	"net/http"
 	"encoding/base64"
-	"github.com/dgrijalva/jwt-go"
-	"fmt"
-	"github.com/plopezm/go-auth-ms/services"
-	"time"
 	"errors"
+	"fmt"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
+	"github.com/plopezm/go-auth-ms/services"
+	"net/http"
+	"strings"
+	"time"
 )
 
 type handler func(c *gin.Context)
 
-func setCORSEnabled(c *gin.Context){
-	c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-	c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-	c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
-	c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-	c.Writer.Header().Set("Access-Control-Max-Age", "86400")
-}
-
-func sendUnauthorized(c *gin.Context, err error){
+func sendUnauthorized(c *gin.Context, err error) {
 	fmt.Println(err.Error())
 	c.String(http.StatusUnauthorized, "Token not valid: ", err.Error())
 	return
 }
 
-func BasicAuth(ptr gin.HandlerFunc) gin.HandlerFunc{
-	return func(c *gin.Context){
+func BasicAuth(ptr gin.HandlerFunc) gin.HandlerFunc {
+	return func(c *gin.Context) {
 		//setCORSEnabled(c)
 
 		auth := strings.SplitN(c.GetHeader("Authorization"), " ", 2)
@@ -60,7 +52,7 @@ func getTokenRemainingValidity(timestamp interface{}) int {
 }
 
 func BearerAuth(ptr gin.HandlerFunc) gin.HandlerFunc {
-	return func(c *gin.Context){
+	return func(c *gin.Context) {
 		//setCORSEnabled(c)
 
 		tokenString := strings.SplitN(c.GetHeader("Authorization"), " ", 2)
@@ -86,7 +78,7 @@ func BearerAuth(ptr gin.HandlerFunc) gin.HandlerFunc {
 				return
 			}
 
-			if getTokenRemainingValidity(expires) == -1{
+			if getTokenRemainingValidity(expires) == -1 {
 				sendUnauthorized(c, errors.New("Token validity expired"))
 				return
 			}
