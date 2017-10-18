@@ -29,7 +29,7 @@ func checkError(err error) {
 	}
 }
 
-func FindAllUsers() (user []User, err error) {
+func FindAllUsers() ([]User, error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
 	users := make([]User, 0)
