@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/plopezm/go-auth-ms/security"
 	"github.com/plopezm/go-auth-ms/services"
 	"github.com/plopezm/goedb"
-	"os"
 )
 
 var router *gin.Engine
@@ -41,9 +42,9 @@ func init() {
 
 	em, err := goedb.GetEntityManager("testing")
 	checkError(err)
-	err = em.Migrate(&services.Role{})
+	err = em.Migrate(&services.Role{}, true, false)
 	//checkError(err)
-	err = em.Migrate(&services.User{})
+	err = em.Migrate(&services.User{}, true, false)
 	//checkError(err)
 
 	role := &services.Role{

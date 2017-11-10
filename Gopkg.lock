@@ -10,8 +10,8 @@
 [[projects]]
   name = "github.com/dgrijalva/jwt-go"
   packages = ["."]
-  revision = "d2709f9f1f31ebcda9651b03077758c1f3a0018c"
-  version = "v3.0.0"
+  revision = "dbeaa9332f19a944acb5736b4456cfcc02140e29"
+  version = "v3.1.0"
 
 [[projects]]
   branch = "master"
@@ -29,13 +29,13 @@
   branch = "master"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
-  revision = "130e6b02ab059e7b717a096f397c5b60111cae74"
+  revision = "1643683e1b54a9e88ad26d98f81400c8c9d9f4f9"
 
 [[projects]]
   branch = "master"
   name = "github.com/jmoiron/sqlx"
   packages = [".","reflectx"]
-  revision = "d9bd385d68c068f1fabb5057e3dedcbcbb039d0f"
+  revision = "3379e5993990b1f927fc8db926485e6f6becf2d2"
 
 [[projects]]
   name = "github.com/mattn/go-isatty"
@@ -46,14 +46,14 @@
 [[projects]]
   name = "github.com/mattn/go-sqlite3"
   packages = ["."]
-  revision = "ca5e3819723d8eeaf170ad510e7da1d6d2e94a08"
-  version = "v1.2.0"
+  revision = "5160b48509cf5c877bc22c11c373f8c7738cdb38"
+  version = "v1.3.0"
 
 [[projects]]
   name = "github.com/plopezm/goedb"
   packages = [".","config","dialect","manager","metadata"]
-  revision = "d12d35cd8049cf328ac3931cc7de06d8bbe4bf3f"
-  version = "v1.0.0-RC5"
+  revision = "851b6d507768baaea8827ded53eade4ec74556e7"
+  version = "v1.0.0-RC6"
 
 [[projects]]
   name = "github.com/pmezard/go-difflib"
@@ -71,19 +71,19 @@
   branch = "master"
   name = "github.com/ugorji/go"
   packages = ["codec"]
-  revision = "54210f4e076c57f351166f0ed60e67d3fca57a36"
+  revision = "427fecfaa50e6cefb64b33173a282fdb18151ab9"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context"]
-  revision = "a04bdaca5b32abe1c069418fb7088ae607de5bd0"
+  revision = "a337091b0525af65de94df2eb7e98bd9962dcbe2"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "ebfc5b4631820b793c9010c87fd8fef0f39eb082"
+  revision = "1e2299c37cc91a509f1b12369872d27be0ce98a6"
 
 [[projects]]
   name = "gopkg.in/go-playground/validator.v8"
