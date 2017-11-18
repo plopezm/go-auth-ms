@@ -5,6 +5,9 @@ vendor/
 #SQLite3
 test.db
 
+#vscode
+debug.test
+
 #Intellij
 .idea/
 
@@ -14,3 +17,6 @@ coverage.txt
 #Binary
 go-auth-ms.exe
 go-auth-ms
+
+#Experimental
+migrations/
