@@ -52,8 +52,8 @@
 [[projects]]
   name = "github.com/plopezm/goedb"
   packages = [".","config","dialect","manager","metadata"]
-  revision = "851b6d507768baaea8827ded53eade4ec74556e7"
-  version = "v1.0.0-RC6"
+  revision = "8a02b70dc69055220db1ecd9121329b5283d33af"
+  version = "v1.0.0-RC7"
 
 [[projects]]
   name = "github.com/pmezard/go-difflib"
@@ -71,7 +71,7 @@
   branch = "master"
   name = "github.com/ugorji/go"
   packages = ["codec"]
-  revision = "427fecfaa50e6cefb64b33173a282fdb18151ab9"
+  revision = "ac9de6ea28e6084fd5ba495d3692c266315c0ebc"
 
 [[projects]]
   branch = "master"

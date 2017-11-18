@@ -2,9 +2,10 @@ package security
 
 import (
 	"crypto/rsa"
-	"github.com/dgrijalva/jwt-go"
 	"io/ioutil"
 	"strconv"
+
+	"github.com/dgrijalva/jwt-go"
 )
 
 var PrivateKey *rsa.PrivateKey
@@ -13,9 +14,9 @@ var PublicKeyKWT JWKRSA
 
 func init() {
 	var err error
-	PrivateKey, err = jwt.ParseRSAPrivateKeyFromPEM(ReadFile("privkey.pem"))
+	PrivateKey, err = jwt.ParseRSAPrivateKeyFromPEM(ReadFile("jwtpriv.pem"))
 	check(err)
-	PublicKey, err = jwt.ParseRSAPublicKeyFromPEM(ReadFile("pubkey.pem"))
+	PublicKey, err = jwt.ParseRSAPublicKeyFromPEM(ReadFile("jwtpub.pem"))
 	check(err)
 	PublicKeyKWT = JWKRSA{
 		Kty: "RSA",

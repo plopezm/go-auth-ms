@@ -2,12 +2,16 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/plopezm/go-auth-ms/models"
+	"github.com/plopezm/go-auth-ms/resources"
 	"github.com/plopezm/go-auth-ms/security"
-	"github.com/plopezm/go-auth-ms/services"
 	"github.com/plopezm/goedb"
 )
 
@@ -42,59 +46,83 @@ func init() {
 
 	em, err := goedb.GetEntityManager("testing")
 	checkError(err)
-	err = em.Migrate(&services.Role{}, true, false)
+	err = em.Migrate(&models.Role{}, true, true)
 	//checkError(err)
-	err = em.Migrate(&services.User{}, true, false)
+	err = em.Migrate(&models.Permission{}, true, true)
+	//checkError(err)
+	err = em.Migrate(&models.User{}, true, true)
 	//checkError(err)
 
-	role := &services.Role{
-		Name: "Admin",
+	role := &models.Role{
+		Name:        "Admin",
+		Description: "Full access role",
 	}
-
-	_, err = em.Insert(role)
+	result, err := em.Insert(role)
+	checkError(err)
 	//checkError(err)
+	role.ID = int(result.LastInsertId)
 
-	role = &services.Role{
-		Name: "Regular",
+	permission := &models.Permission{
+		Name:        "sysadmin",
+		Description: "Full access",
+		Role:        *role,
 	}
-
-	_, err = em.Insert(role)
+	_, err = em.Insert(permission)
 	//checkError(err)
 
-	em.First(role, "Role.Name = :name", map[string]interface{}{
-		"name": "Regular",
-	})
-
-	user := &services.User{
+	user := &models.User{
 		Email:    "admin",
 		Password: "admin",
 		Role:     *role,
 	}
-
 	_, err = em.Insert(user)
 	//checkError(err)
 }
 
-func AddAuthRoutes(router *gin.Engine) {
+func parseCommandInput(args []string) (port string, secure bool) {
+	port = "80"
+	secure = false
+
+	for _, arg := range args {
+		if strings.HasPrefix(arg, "https") {
+			secure = true
+			if port == "80" {
+				port = "443"
+			}
+		}
+		if strings.HasPrefix(arg, "p=") {
+			port = strings.TrimPrefix(arg, "p=")
+		}
+	}
+	return port, secure
 }
 
 func main() {
+	port, secure := parseCommandInput(os.Args)
+
 	router = gin.Default()
 	router.Use(CORSMiddleware())
 	v1 := router.Group("/api/v1")
-	v1.GET("/login", security.BasicAuth(Login))
+	v1.GET("/login", security.BasicAuth(resources.Login))
 	//v1.GET("/verify", security.BearerAuth(Verify))
-	v1.GET("/refresh", security.BearerAuth(Refresh))
-	v1.GET("/pubkey", GetPublicKey)
-	v1.GET("/users", security.BearerAuth(GetUsers))
-	v1.GET("/users/:id", security.BearerAuth(GetUserById))
-	v1.POST("/users", security.BearerAuth(CreateUser))
-	v1.PUT("/users", security.BearerAuth(UpdateUser))
-	v1.DELETE("/users/:id", security.BearerAuth(DeleteUser))
-	v1.GET("/roles", security.BearerAuth(GetRoles))
-	v1.GET("/roles/:id", security.BearerAuth(GetRoleById))
-	v1.POST("/roles", security.BearerAuth(CreateRole))
-	v1.PUT("/roles", security.BearerAuth(UpdateRole))
-	v1.DELETE("/roles/:id", security.BearerAuth(DeleteRole))
-	router.Run("0.0.0.0:9090")
+	v1.GET("/refresh", security.BearerAuth(resources.Refresh))
+	v1.GET("/pubkey", resources.GetPublicKey)
+	v1.GET("/users", security.BearerAuth(resources.GetUsers))
+	v1.GET("/users/:id", security.BearerAuth(resources.GetUserById))
+	v1.POST("/users", security.BearerAuth(resources.CreateUser))
+	v1.PUT("/users", security.BearerAuth(resources.UpdateUser))
+	v1.DELETE("/users/:id", security.BearerAuth(resources.DeleteUser))
+	v1.GET("/roles", security.BearerAuth(resources.GetRoles))
+	v1.GET("/roles/:id", security.BearerAuth(resources.GetRoleById))
+	v1.POST("/roles", security.BearerAuth(resources.CreateRole))
+	v1.PUT("/roles", security.BearerAuth(resources.UpdateRole))
+	v1.DELETE("/roles/:id", security.BearerAuth(resources.DeleteRole))
+
+	log.Println("Launching server at port", port, "with security", secure)
+
+	if secure {
+		log.Fatal(http.ListenAndServeTLS("0.0.0.0:"+port, "server.crt", "server.key", router))
+	} else {
+		http.ListenAndServe("0.0.0.0:"+port, router)
+	}
 }

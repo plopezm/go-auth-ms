@@ -3,22 +3,11 @@ package services
 import (
 	"errors"
 	"fmt"
-	_ "github.com/mattn/go-sqlite3"
-	"github.com/plopezm/goedb"
 	"os"
+
+	"github.com/plopezm/go-auth-ms/models"
+	"github.com/plopezm/goedb"
 )
-
-type Role struct {
-	ID   int    `goedb:"pk,autoincrement"`
-	Name string `goedb:"unique"`
-}
-
-type User struct {
-	ID       int    `goedb:"pk,autoincrement"`
-	Email    string `goedb:"unique"`
-	Password string
-	Role     Role `goedb:"fk=Role(ID)"`
-}
 
 const PersistenceUnit = "testing"
 
@@ -29,18 +18,18 @@ func checkError(err error) {
 	}
 }
 
-func FindAllUsers() ([]User, error) {
+func FindAllUsers() ([]models.User, error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
-	users := make([]User, 0)
+	users := make([]models.User, 0)
 	err = em.Find(&users, "", nil)
 	return users, err
 }
 
-func GetUserById(id int) (user User, err error) {
+func GetUserById(id int) (user models.User, err error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
-	user = User{}
+	user = models.User{}
 	user.ID = id
 	err = em.First(&user, "", nil)
 	if err != nil {
@@ -49,10 +38,10 @@ func GetUserById(id int) (user User, err error) {
 	return user, err
 }
 
-func GetUserByAccount(username string, pass string) (user User, err error) {
+func GetUserByAccount(username string, pass string) (user models.User, err error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
-	user = User{}
+	user = models.User{}
 	err = em.First(&user, "User.Email = :email AND User.Password = :pass", map[string]interface{}{
 		"email": username,
 		"pass":  pass,
@@ -63,7 +52,7 @@ func GetUserByAccount(username string, pass string) (user User, err error) {
 	return user, err
 }
 
-func CreateUser(user User) (User, error) {
+func CreateUser(user models.User) (models.User, error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
 
@@ -79,7 +68,7 @@ func CreateUser(user User) (User, error) {
 	return user, nil
 }
 
-func UpdateUser(user User) (User, error) {
+func UpdateUser(user models.User) (models.User, error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
 
@@ -95,10 +84,10 @@ func UpdateUser(user User) (User, error) {
 	return user, nil
 }
 
-func DeleteUserById(id int) (user User, err error) {
+func DeleteUserById(id int) (user models.User, err error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
-	user = User{}
+	user = models.User{}
 	user.ID = id
 	result, err := em.Remove(&user, "", nil)
 	if err != nil {
@@ -110,18 +99,18 @@ func DeleteUserById(id int) (user User, err error) {
 	return user, err
 }
 
-func FindAllRoles() ([]Role, error) {
+func FindAllRoles() ([]models.Role, error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
-	roles := make([]Role, 0)
+	roles := make([]models.Role, 0)
 	err = em.Find(&roles, "", nil)
 	return roles, err
 }
 
-func GetRoleById(id int) (role Role, err error) {
+func GetRoleById(id int) (role models.Role, err error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
-	role = Role{}
+	role = models.Role{}
 	role.ID = id
 	err = em.First(&role, "", nil)
 	if err != nil {
@@ -130,7 +119,7 @@ func GetRoleById(id int) (role Role, err error) {
 	return role, err
 }
 
-func CreateRole(role Role) (Role, error) {
+func CreateRole(role models.Role) (models.Role, error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
 
@@ -146,7 +135,7 @@ func CreateRole(role Role) (Role, error) {
 	return role, nil
 }
 
-func UpdateRole(role Role) (Role, error) {
+func UpdateRole(role models.Role) (models.Role, error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
 
@@ -162,10 +151,10 @@ func UpdateRole(role Role) (Role, error) {
 	return role, nil
 }
 
-func DeleteRoleById(id int) (role Role, err error) {
+func DeleteRoleById(id int) (role models.Role, err error) {
 	em, err := goedb.GetEntityManager(PersistenceUnit)
 	checkError(err)
-	role = Role{}
+	role = models.Role{}
 	role.ID = id
 	result, err := em.Remove(&role, "", nil)
 	if err != nil {
@@ -174,5 +163,35 @@ func DeleteRoleById(id int) (role Role, err error) {
 	if result.NumRecordsAffected == 0 {
 		return role, errors.New("Role not found")
 	}
+	return role, err
+}
+
+func GetRolesWithPermissions() (roles []models.Role, err error) {
+	em, err := goedb.GetEntityManager(PersistenceUnit)
+	checkError(err)
+
+	em.Find(&roles, "", nil)
+
+	//for _, role := range roles {
+	for i := 0; i < len(roles); i++ {
+		em.Find(&roles[i].Permissions, "Permission.Role = :role_id", map[string]interface{}{
+			"role_id": roles[i].ID,
+		})
+		fmt.Println(roles[i])
+	}
+	fmt.Println(roles)
+	return roles, err
+}
+
+func GetRoleWithPermissions(id int) (role models.Role, err error) {
+	em, err := goedb.GetEntityManager(PersistenceUnit)
+	checkError(err)
+	role, err = GetRoleById(id)
+	if err != nil {
+		return role, err
+	}
+	em.Find(role.Permissions, "Permission.Role = :role_id", map[string]interface{}{
+		"role_id": id,
+	})
 	return role, err
 }

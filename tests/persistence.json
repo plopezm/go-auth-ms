@@ -1,0 +1,9 @@
+{
+  "datasources":[
+    {
+      "name": "testing",
+      "driver": "sqlite3",
+      "url": "./test.db"
+    }
+  ]
+}

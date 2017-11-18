@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
 
-openssl genrsa -out privkey.pem 4096
-openssl rsa -in privkey.pem -pubout -out pubkey.pem
+openssl genrsa -out jwtpriv.pem 4096
+openssl rsa -in jwtpriv.pem -pubout -out jwtpub.pem
+
+openssl genrsa -out server.key 4096
+openssl req -new -x509 -sha512 -key server.key -out server.crt -days 3650
+
