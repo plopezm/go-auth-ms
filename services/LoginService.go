@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/plopezm/go-auth-ms/models"
 	"github.com/plopezm/goedb"
 )
@@ -194,4 +195,13 @@ func GetRoleWithPermissions(id int) (role models.Role, err error) {
 		"role_id": id,
 	})
 	return role, err
+}
+
+func ValidateUser(c *gin.Context, username, password string) bool {
+	user, err := GetUserByAccount(username, password)
+	if err != nil {
+		return false
+	}
+	c.Set("username", user.Email)
+	return true
 }

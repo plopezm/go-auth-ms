@@ -29,7 +29,7 @@
   branch = "master"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
-  revision = "1643683e1b54a9e88ad26d98f81400c8c9d9f4f9"
+  revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
 
 [[projects]]
   branch = "master"
@@ -46,14 +46,20 @@
 [[projects]]
   name = "github.com/mattn/go-sqlite3"
   packages = ["."]
-  revision = "5160b48509cf5c877bc22c11c373f8c7738cdb38"
-  version = "v1.3.0"
+  revision = "ed69081a91fd053f17672236b0dd52ba7485e1a3"
+  version = "v1.4.0"
 
 [[projects]]
   name = "github.com/plopezm/goedb"
   packages = [".","config","dialect","manager","metadata"]
-  revision = "8a02b70dc69055220db1ecd9121329b5283d33af"
-  version = "v1.0.0-RC7"
+  revision = "4ba5a7acf3883fa162c6415c5ab7147b51139964"
+  version = "v1.0.0-RC9"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/plopezm/gosm"
+  packages = ["gingonic/cors","gingonic/security/basic","gingonic/security/jwt","gingonic/support"]
+  revision = "b2a300a7a7fc05e0fead0e1b70a787f38309df07"
 
 [[projects]]
   name = "github.com/pmezard/go-difflib"
@@ -71,19 +77,19 @@
   branch = "master"
   name = "github.com/ugorji/go"
   packages = ["codec"]
-  revision = "ac9de6ea28e6084fd5ba495d3692c266315c0ebc"
+  revision = "50329c0f550792d7ec08500e25948b4de2560f68"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context"]
-  revision = "a337091b0525af65de94df2eb7e98bd9962dcbe2"
+  revision = "9dfe39835686865bff950a07b394c12a98ddc811"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "1e2299c37cc91a509f1b12369872d27be0ce98a6"
+  revision = "0ac51a24ef1c37380f98ba8b98f56e3bffd59850"
 
 [[projects]]
   name = "gopkg.in/go-playground/validator.v8"
@@ -95,11 +101,11 @@
   branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "eb3733d160e74a9c7e442f435eb3bea458e1d19f"
+  revision = "287cf08546ab5e7e37d55a84f7ed3fd1db036de5"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "19b67c2bb55868ff61e0f2bf8af20140e45ad9e8226486860f4079c677b9030a"
+  inputs-digest = "e99f6659509227e2359a6e87b7312d7d790c7b9209b47d1ad2d4b606cc552d09"
   solver-name = "gps-cdcl"
   solver-version = 1

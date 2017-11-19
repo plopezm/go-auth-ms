@@ -9,25 +9,19 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/plopezm/go-auth-ms/models"
-	"github.com/plopezm/go-auth-ms/security"
-	"github.com/plopezm/go-auth-ms/security/jwtmodels"
 	"github.com/plopezm/go-auth-ms/services"
 )
 
-func generateNewJWT(claims jwt.Claims) (tokenString string) {
-	token := jwt.NewWithClaims(jwt.SigningMethodRS512, claims)
+// 24 hours
+const TOKEN_TTL = 86400000
 
-	// Sign and get the complete encoded token as a string using the secret
-	tokenString, err := token.SignedString(security.PrivateKey)
-
-	if err != nil {
-		fmt.Println("[generateNewJWT]: ", err)
-	}
-	return tokenString
+type AuthToken struct {
+	Type  string `json:"type"`
+	Token string `json:"token"`
 }
 
 func GetPublicKey(c *gin.Context) {
-	c.JSON(http.StatusOK, security.PublicKeyKWT)
+	c.JSON(http.StatusOK, services.JWKInfoToken)
 }
 
 func Login(c *gin.Context) {
@@ -36,12 +30,12 @@ func Login(c *gin.Context) {
 		c.Status(http.StatusUnauthorized)
 		return
 	}
-	token := generateNewJWT(jwt.MapClaims{
+	token := services.GenerateNewJWT(jwt.MapClaims{
 		"user": username,
-		"exp":  time.Now().Add(time.Millisecond * jwtmodels.TOKEN_TTL).Unix(),
+		"exp":  time.Now().Add(time.Millisecond * TOKEN_TTL).Unix(),
 	})
 	c.Writer.Header().Set("Authorization", "Bearer "+token)
-	c.JSON(http.StatusOK, jwtmodels.AuthToken{
+	c.JSON(http.StatusOK, AuthToken{
 		Type:  "Bearer",
 		Token: token,
 	})
@@ -54,10 +48,10 @@ func Refresh(c *gin.Context) {
 		return
 	}
 	if claims, ok := value.(jwt.MapClaims); ok {
-		claims["exp"] = time.Now().Add(time.Second * jwtmodels.TOKEN_TTL).Unix()
-		token := generateNewJWT(claims)
+		claims["exp"] = time.Now().Add(time.Second * TOKEN_TTL).Unix()
+		token := services.GenerateNewJWT(claims)
 		c.Header("Authorization", "Bearer "+token)
-		c.JSON(http.StatusOK, jwtmodels.AuthToken{
+		c.JSON(http.StatusOK, AuthToken{
 			Type:  "Bearer",
 			Token: token,
 		})

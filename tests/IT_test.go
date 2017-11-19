@@ -7,12 +7,19 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/plopezm/gosm/gingonic/security/basic"
+	"github.com/plopezm/gosm/gingonic/security/jwt"
+	"github.com/plopezm/gosm/gingonic/support"
+
 	"github.com/gin-gonic/gin"
 	"github.com/plopezm/go-auth-ms/resources"
-	"github.com/plopezm/go-auth-ms/security"
-	"github.com/plopezm/go-auth-ms/security/jwtmodels"
+	"github.com/plopezm/go-auth-ms/services"
 	"github.com/stretchr/testify/assert"
 )
+
+func init() {
+	services.JWTPrivateKey, services.JWTPublicKey, services.JWKInfoToken = support.GetJWTKeys("go-auth", "jwkpriv.pem", "jwkpub.pem")
+}
 
 func TestGetPublicKey(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/pubkey", nil)
@@ -30,7 +37,7 @@ func TestLoginNotAuthorized(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	r := gin.Default()
-	r.GET("/login", security.BasicAuth(resources.Login))
+	r.GET("/login", basic.AuthMiddleware(resources.Login, services.ValidateUser))
 	r.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
@@ -42,7 +49,7 @@ func TestLoginUnauthorized(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	r := gin.Default()
-	r.GET("/login", security.BasicAuth(resources.Login))
+	r.GET("/login", basic.AuthMiddleware(resources.Login, services.ValidateUser))
 	r.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
@@ -54,11 +61,11 @@ func TestLogin(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	r := gin.Default()
-	r.GET("/login", security.BasicAuth(resources.Login))
-	r.GET("/refresh", security.BearerAuth(resources.Refresh))
+	r.GET("/login", basic.AuthMiddleware(resources.Login, services.ValidateUser))
+	r.GET("/refresh", jwt.BearerAuthMiddleware(resources.GetUserById, services.JWTPrivateKey, services.JWTPublicKey))
 	r.ServeHTTP(w, req)
 
-	var token jwtmodels.AuthToken
+	var token resources.AuthToken
 	json.Unmarshal(w.Body.Bytes(), &token)
 
 	assert.Equal(t, "Bearer", token.Type)

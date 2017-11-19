@@ -11,28 +11,15 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/plopezm/go-auth-ms/models"
 	"github.com/plopezm/go-auth-ms/resources"
-	"github.com/plopezm/go-auth-ms/security"
+	"github.com/plopezm/go-auth-ms/services"
 	"github.com/plopezm/goedb"
+	"github.com/plopezm/gosm/gingonic/cors"
+	"github.com/plopezm/gosm/gingonic/security/basic"
+	"github.com/plopezm/gosm/gingonic/security/jwt"
+	"github.com/plopezm/gosm/gingonic/support"
 )
 
 var router *gin.Engine
-
-func CORSMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		//fmt.Println("Generating CORS headers")
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "OPTIONS, GET, POST, PUT, DELETE")
-		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-		c.Writer.Header().Set("Access-Control-Max-Age", "86400")
-
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(204)
-			return
-		}
-		c.Next()
-	}
-}
 
 func checkError(err error) {
 	if err != nil {
@@ -101,22 +88,29 @@ func main() {
 	port, secure := parseCommandInput(os.Args)
 
 	router = gin.Default()
-	router.Use(CORSMiddleware())
+	router.Use(cors.Middleware("http://localhost:3000",
+		"Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With",
+		"OPTIONS, GET, POST, PUT, DELETE",
+		true,
+		86400))
+
+	// privKey, publicKey, jwkInfo := rsa.GetJWTKeys("go-auth", "jwkpriv.pem", "jwkpub.pem")
+	services.JWTPrivateKey, services.JWTPublicKey, services.JWKInfoToken = support.GetJWTKeys("go-auth", "jwkpriv.pem", "jwkpub.pem")
+
 	v1 := router.Group("/api/v1")
-	v1.GET("/login", security.BasicAuth(resources.Login))
-	//v1.GET("/verify", security.BearerAuth(Verify))
-	v1.GET("/refresh", security.BearerAuth(resources.Refresh))
+	v1.GET("/login", basic.AuthMiddleware(resources.Login, services.ValidateUser))
+	v1.GET("/refresh", jwt.BearerAuthMiddleware(resources.Refresh, services.JWTPrivateKey, services.JWTPublicKey))
 	v1.GET("/pubkey", resources.GetPublicKey)
-	v1.GET("/users", security.BearerAuth(resources.GetUsers))
-	v1.GET("/users/:id", security.BearerAuth(resources.GetUserById))
-	v1.POST("/users", security.BearerAuth(resources.CreateUser))
-	v1.PUT("/users", security.BearerAuth(resources.UpdateUser))
-	v1.DELETE("/users/:id", security.BearerAuth(resources.DeleteUser))
-	v1.GET("/roles", security.BearerAuth(resources.GetRoles))
-	v1.GET("/roles/:id", security.BearerAuth(resources.GetRoleById))
-	v1.POST("/roles", security.BearerAuth(resources.CreateRole))
-	v1.PUT("/roles", security.BearerAuth(resources.UpdateRole))
-	v1.DELETE("/roles/:id", security.BearerAuth(resources.DeleteRole))
+	v1.GET("/users", jwt.BearerAuthMiddleware(resources.GetUsers, services.JWTPrivateKey, services.JWTPublicKey))
+	v1.GET("/users/:id", jwt.BearerAuthMiddleware(resources.GetUserById, services.JWTPrivateKey, services.JWTPublicKey))
+	v1.POST("/users", jwt.BearerAuthMiddleware(resources.CreateUser, services.JWTPrivateKey, services.JWTPublicKey))
+	v1.PUT("/users", jwt.BearerAuthMiddleware(resources.UpdateUser, services.JWTPrivateKey, services.JWTPublicKey))
+	v1.DELETE("/users/:id", jwt.BearerAuthMiddleware(resources.DeleteUser, services.JWTPrivateKey, services.JWTPublicKey))
+	v1.GET("/roles", jwt.BearerAuthMiddleware(resources.GetRoles, services.JWTPrivateKey, services.JWTPublicKey))
+	v1.GET("/roles/:id", jwt.BearerAuthMiddleware(resources.GetRoleById, services.JWTPrivateKey, services.JWTPublicKey))
+	v1.POST("/roles", jwt.BearerAuthMiddleware(resources.CreateRole, services.JWTPrivateKey, services.JWTPublicKey))
+	v1.PUT("/roles", jwt.BearerAuthMiddleware(resources.UpdateRole, services.JWTPrivateKey, services.JWTPublicKey))
+	v1.DELETE("/roles/:id", jwt.BearerAuthMiddleware(resources.DeleteRole, services.JWTPrivateKey, services.JWTPublicKey))
 
 	log.Println("Launching server at port", port, "with security", secure)
 
