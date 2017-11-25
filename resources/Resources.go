@@ -21,7 +21,7 @@ type AuthToken struct {
 }
 
 func GetPublicKey(c *gin.Context) {
-	c.JSON(http.StatusOK, services.JWKInfoToken)
+	c.JSON(http.StatusOK, services.Keystore.GetJWK())
 }
 
 func Login(c *gin.Context) {

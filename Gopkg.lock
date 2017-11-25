@@ -58,8 +58,8 @@
 [[projects]]
   branch = "master"
   name = "github.com/plopezm/gosm"
-  packages = ["gingonic/cors","gingonic/security/basic","gingonic/security/jwt","gingonic/support"]
-  revision = "b2a300a7a7fc05e0fead0e1b70a787f38309df07"
+  packages = ["gingonic/cors","gingonic/rsastore","gingonic/security"]
+  revision = "3504f0bca1575b5bc66f92152682a8af4774648c"
 
 [[projects]]
   name = "github.com/pmezard/go-difflib"
@@ -77,19 +77,19 @@
   branch = "master"
   name = "github.com/ugorji/go"
   packages = ["codec"]
-  revision = "50329c0f550792d7ec08500e25948b4de2560f68"
+  revision = "84cb69a8af8316eed8cf4a3c9368a56977850062"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context"]
-  revision = "9dfe39835686865bff950a07b394c12a98ddc811"
+  revision = "c7086645de248775cbf2373cf5ca4d2fa664b8c1"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "0ac51a24ef1c37380f98ba8b98f56e3bffd59850"
+  revision = "4ff8c001ce4cc464e644b922325097228fce14d8"
 
 [[projects]]
   name = "gopkg.in/go-playground/validator.v8"
@@ -106,6 +106,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e99f6659509227e2359a6e87b7312d7d790c7b9209b47d1ad2d4b606cc552d09"
+  inputs-digest = "114b6b90658052975afcdcc366e453366e44caffd283557da4578dae10337745"
   solver-name = "gps-cdcl"
   solver-version = 1

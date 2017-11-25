@@ -7,6 +7,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/plopezm/gosm/gingonic/rsastore"
+
 	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/plopezm/go-auth-ms/models"
@@ -14,9 +16,7 @@ import (
 	"github.com/plopezm/go-auth-ms/services"
 	"github.com/plopezm/goedb"
 	"github.com/plopezm/gosm/gingonic/cors"
-	"github.com/plopezm/gosm/gingonic/security/basic"
-	"github.com/plopezm/gosm/gingonic/security/jwt"
-	"github.com/plopezm/gosm/gingonic/support"
+	"github.com/plopezm/gosm/gingonic/security"
 )
 
 var router *gin.Engine
@@ -95,25 +95,24 @@ func main() {
 		86400))
 
 	// privKey, publicKey, jwkInfo := rsa.GetJWTKeys("go-auth", "jwkpriv.pem", "jwkpub.pem")
-	services.JWTPrivateKey, services.JWTPublicKey, services.JWKInfoToken = support.GetJWTKeys("go-auth", "jwkpriv.pem", "jwkpub.pem")
+	services.Keystore = rsastore.GetJWTKeys("go-auth", "jwkpriv.pem", "jwkpub.pem")
 
 	v1 := router.Group("/api/v1")
-	v1.GET("/login", basic.AuthMiddleware(resources.Login, services.ValidateUser))
-	v1.GET("/refresh", jwt.BearerAuthMiddleware(resources.Refresh, services.JWTPrivateKey, services.JWTPublicKey))
+	v1.GET("/login", security.BasicAuthMiddleware(resources.Login, services.ValidateUser))
+	v1.GET("/refresh", security.JwtRsaBearerAuthMiddleware(resources.Refresh, services.Keystore))
 	v1.GET("/pubkey", resources.GetPublicKey)
-	v1.GET("/users", jwt.BearerAuthMiddleware(resources.GetUsers, services.JWTPrivateKey, services.JWTPublicKey))
-	v1.GET("/users/:id", jwt.BearerAuthMiddleware(resources.GetUserById, services.JWTPrivateKey, services.JWTPublicKey))
-	v1.POST("/users", jwt.BearerAuthMiddleware(resources.CreateUser, services.JWTPrivateKey, services.JWTPublicKey))
-	v1.PUT("/users", jwt.BearerAuthMiddleware(resources.UpdateUser, services.JWTPrivateKey, services.JWTPublicKey))
-	v1.DELETE("/users/:id", jwt.BearerAuthMiddleware(resources.DeleteUser, services.JWTPrivateKey, services.JWTPublicKey))
-	v1.GET("/roles", jwt.BearerAuthMiddleware(resources.GetRoles, services.JWTPrivateKey, services.JWTPublicKey))
-	v1.GET("/roles/:id", jwt.BearerAuthMiddleware(resources.GetRoleById, services.JWTPrivateKey, services.JWTPublicKey))
-	v1.POST("/roles", jwt.BearerAuthMiddleware(resources.CreateRole, services.JWTPrivateKey, services.JWTPublicKey))
-	v1.PUT("/roles", jwt.BearerAuthMiddleware(resources.UpdateRole, services.JWTPrivateKey, services.JWTPublicKey))
-	v1.DELETE("/roles/:id", jwt.BearerAuthMiddleware(resources.DeleteRole, services.JWTPrivateKey, services.JWTPublicKey))
+	v1.GET("/users", security.JwtRsaBearerAuthMiddleware(resources.GetUsers, services.Keystore))
+	v1.GET("/users/:id", security.JwtRsaBearerAuthMiddleware(resources.GetUserById, services.Keystore))
+	v1.POST("/users", security.JwtRsaBearerAuthMiddleware(resources.CreateUser, services.Keystore))
+	v1.PUT("/users", security.JwtRsaBearerAuthMiddleware(resources.UpdateUser, services.Keystore))
+	v1.DELETE("/users/:id", security.JwtRsaBearerAuthMiddleware(resources.DeleteUser, services.Keystore))
+	v1.GET("/roles", security.JwtRsaBearerAuthMiddleware(resources.GetRoles, services.Keystore))
+	v1.GET("/roles/:id", security.JwtRsaBearerAuthMiddleware(resources.GetRoleById, services.Keystore))
+	v1.POST("/roles", security.JwtRsaBearerAuthMiddleware(resources.CreateRole, services.Keystore))
+	v1.PUT("/roles", security.JwtRsaBearerAuthMiddleware(resources.UpdateRole, services.Keystore))
+	v1.DELETE("/roles/:id", security.JwtRsaBearerAuthMiddleware(resources.DeleteRole, services.Keystore))
 
 	log.Println("Launching server at port", port, "with security", secure)
-
 	if secure {
 		log.Fatal(http.ListenAndServeTLS("0.0.0.0:"+port, "server.crt", "server.key", router))
 	} else {
