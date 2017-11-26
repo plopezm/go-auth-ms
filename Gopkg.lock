@@ -59,7 +59,7 @@
   branch = "master"
   name = "github.com/plopezm/gosm"
   packages = ["gingonic/cors","gingonic/rsastore","gingonic/security"]
-  revision = "3504f0bca1575b5bc66f92152682a8af4774648c"
+  revision = "74a880050270540226bd390af24dd48fbeed86b1"
 
 [[projects]]
   name = "github.com/pmezard/go-difflib"
