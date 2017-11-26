@@ -111,6 +111,11 @@ func main() {
 	v1.POST("/roles", security.JwtRsaBearerAuthMiddleware(resources.CreateRole, services.Keystore))
 	v1.PUT("/roles", security.JwtRsaBearerAuthMiddleware(resources.UpdateRole, services.Keystore))
 	v1.DELETE("/roles/:id", security.JwtRsaBearerAuthMiddleware(resources.DeleteRole, services.Keystore))
+	v1.GET("/permissions", security.JwtRsaBearerAuthMiddleware(resources.GetPermissions, services.Keystore))
+	v1.GET("/permissions/:id", security.JwtRsaBearerAuthMiddleware(resources.GetPermissionById, services.Keystore))
+	v1.POST("/permissions", security.JwtRsaBearerAuthMiddleware(resources.CreatePermission, services.Keystore))
+	v1.PUT("/permissions", security.JwtRsaBearerAuthMiddleware(resources.UpdatePermission, services.Keystore))
+	v1.DELETE("/permissions/:id", security.JwtRsaBearerAuthMiddleware(resources.DeletePermission, services.Keystore))
 
 	log.Println("Launching server at port", port, "with security", secure)
 	if secure {

@@ -179,3 +179,63 @@ func DeleteRole(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, role)
 }
+
+func GetPermissions(c *gin.Context) {
+	permissions, err := services.FindAllPermissions()
+	if err != nil {
+		fmt.Println("Error finding permissions: ", err)
+		c.JSON(http.StatusNotFound, err)
+		return
+	}
+	c.JSON(http.StatusOK, permissions)
+}
+
+func GetPermissionById(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	permission, err := services.GetPermissionById(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, err)
+		return
+	}
+	c.JSON(http.StatusOK, permission)
+}
+
+func CreatePermission(c *gin.Context) {
+	var permission models.Permission
+	c.BindJSON(&permission)
+	permission, err := services.CreatePermission(permission)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	c.JSON(http.StatusCreated, permission)
+}
+
+func UpdatePermission(c *gin.Context) {
+	var permission models.Permission
+	c.BindJSON(&permission)
+	permission, err := services.UpdatePermission(permission)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	c.JSON(http.StatusCreated, permission)
+}
+
+func DeletePermission(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	permission, err := services.DeletePermissionById(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, err)
+		return
+	}
+	c.JSON(http.StatusOK, permission)
+}

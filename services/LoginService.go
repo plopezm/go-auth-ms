@@ -205,3 +205,70 @@ func ValidateUser(c *gin.Context, username, password string) bool {
 	c.Set("username", user.Email)
 	return true
 }
+
+func FindAllPermissions() ([]models.Permission, error) {
+	em, err := goedb.GetEntityManager(PersistenceUnit)
+	checkError(err)
+	permissions := make([]models.Permission, 0)
+	err = em.Find(&permissions, "", nil)
+	return permissions, err
+}
+
+func GetPermissionById(id int) (permission models.Permission, err error) {
+	em, err := goedb.GetEntityManager(PersistenceUnit)
+	checkError(err)
+	permission = models.Permission{}
+	permission.ID = id
+	err = em.First(&permission, "", nil)
+	if err != nil {
+		return permission, err
+	}
+	return permission, err
+}
+
+func CreatePermission(permission models.Permission) (models.Permission, error) {
+	em, err := goedb.GetEntityManager(PersistenceUnit)
+	checkError(err)
+
+	result, err := em.Insert(&permission)
+	if err != nil {
+		return permission, err
+	}
+
+	if result.NumRecordsAffected == 0 {
+		return permission, errors.New("Creation failed")
+	}
+
+	return permission, nil
+}
+
+func UpdatePermission(permission models.Permission) (models.Permission, error) {
+	em, err := goedb.GetEntityManager(PersistenceUnit)
+	checkError(err)
+
+	result, err := em.Update(&permission)
+	if err != nil {
+		return permission, err
+	}
+
+	if result.NumRecordsAffected == 0 {
+		return permission, errors.New("Update failed")
+	}
+
+	return permission, nil
+}
+
+func DeletePermissionById(id int) (permission models.Permission, err error) {
+	em, err := goedb.GetEntityManager(PersistenceUnit)
+	checkError(err)
+	permission = models.Permission{}
+	permission.ID = id
+	result, err := em.Remove(&permission, "", nil)
+	if err != nil {
+		return permission, err
+	}
+	if result.NumRecordsAffected == 0 {
+		return permission, errors.New("Role not found")
+	}
+	return permission, err
+}
