@@ -37,6 +37,8 @@ func init() {
 	//checkError(err)
 	err = em.Migrate(&models.Permission{}, true, true)
 	//checkError(err)
+	err = em.Migrate(&models.PermissionsGroup{}, true, true)
+	//checkError(err)
 	err = em.Migrate(&models.User{}, true, true)
 	//checkError(err)
 
@@ -52,10 +54,15 @@ func init() {
 	permission := &models.Permission{
 		Name:        "sysadmin",
 		Description: "Full access",
-		Role:        *role,
 	}
 	_, err = em.Insert(permission)
 	//checkError(err)
+
+	permissionGroup := &models.PermissionsGroup{
+		Role:       *role,
+		Permission: *permission,
+	}
+	_, err = em.Insert(permissionGroup)
 
 	user := &models.User{
 		Email:    "admin",

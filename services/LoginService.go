@@ -173,12 +173,11 @@ func GetRolesWithPermissions() (roles []models.Role, err error) {
 
 	em.Find(&roles, "", nil)
 
-	//for _, role := range roles {
 	for i := 0; i < len(roles); i++ {
-		em.Find(&roles[i].Permissions, "Permission.Role = :role_id", map[string]interface{}{
+		//TODO: I have to implement the join in normal Find
+		em.NativeFind(&roles[i].Permissions, "SELECT perm.* FROM Permission perm WHERE perm.ID IN (SELECT pg.Permission FROM PermissionsGroup pg WHERE pg.Role = :role_id)", map[string]interface{}{
 			"role_id": roles[i].ID,
 		})
-		fmt.Println(roles[i])
 	}
 	fmt.Println(roles)
 	return roles, err
@@ -191,8 +190,8 @@ func GetRoleWithPermissions(id int) (role models.Role, err error) {
 	if err != nil {
 		return role, err
 	}
-	em.Find(role.Permissions, "Permission.Role = :role_id", map[string]interface{}{
-		"role_id": id,
+	em.NativeFind(&role.Permissions, "SELECT perm.* FROM Permission perm WHERE perm.ID IN (SELECT pg.Permission FROM PermissionsGroup pg WHERE pg.Role = :role_id)", map[string]interface{}{
+		"role_id": role.ID,
 	})
 	return role, err
 }

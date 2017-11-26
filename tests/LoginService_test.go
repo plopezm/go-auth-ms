@@ -26,11 +26,13 @@ func init() {
 		log.Fatal(err)
 		os.Exit(1)
 	}
-	em.Migrate(&models.Role{}, true, false)
+	em.Migrate(&models.Role{}, true, true)
 
-	em.Migrate(&models.Permission{}, true, false)
+	em.Migrate(&models.Permission{}, true, true)
 
-	em.Migrate(&models.User{}, true, false)
+	em.Migrate(&models.User{}, true, true)
+
+	em.Migrate(&models.PermissionsGroup{}, true, true)
 
 	role := models.Role{
 		Name:        "admin",
@@ -38,17 +40,24 @@ func init() {
 	}
 
 	result, err := em.Insert(&role)
-	//checkError(err)
+	checkError(err)
 	role.ID = int(result.LastInsertId)
 
 	permission := models.Permission{
 		Name:        "sysadmin",
 		Description: "Full access",
-		Role:        role,
 	}
 
 	_, err = em.Insert(&permission)
-	//checkError(err)
+	checkError(err)
+	permission.ID = int(result.LastInsertId)
+
+	permissionGroup := models.PermissionsGroup{
+		Role:       role,
+		Permission: permission,
+	}
+	_, err = em.Insert(&permissionGroup)
+	checkError(err)
 
 	user := models.User{
 		Email:    "admin",
@@ -57,7 +66,7 @@ func init() {
 	}
 
 	_, err = em.Insert(&user)
-	//checkError(err)
+	checkError(err)
 }
 
 func TestGetRolesWithPermissions(t *testing.T) {
@@ -67,4 +76,14 @@ func TestGetRolesWithPermissions(t *testing.T) {
 	assert.Equal(t, 1, len(roles))
 	t.Log(roles)
 	assert.Equal(t, 1, len(roles[0].Permissions))
+	assert.Equal(t, "sysadmin", roles[0].Permissions[0].Name)
+}
+
+func TestGetRolesWithPermissionsById(t *testing.T) {
+	role, err := services.GetRoleWithPermissions(1)
+	assert.Nil(t, err)
+	assert.NotNil(t, role)
+	t.Log(role)
+	assert.Equal(t, 1, len(role.Permissions))
+	assert.Equal(t, "sysadmin", role.Permissions[0].Name)
 }
